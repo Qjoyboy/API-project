@@ -13,10 +13,10 @@ class Course(models.Model):
         verbose_name_plural='Курсы'
 
 class Lesson(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='урок')
     title = models.CharField(max_length=100, verbose_name='Название урока')
     preview = models.ImageField(upload_to='media/preview/', null=True, blank=True)
     description = models.TextField(verbose_name='описание урока')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lesson')
     url = models.URLField(max_length=250, null=True, blank=True)
 
     def __str__(self):
