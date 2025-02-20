@@ -17,7 +17,8 @@ class LessonSerializer(serializers.ModelSerializer):
 
 class CourseSerializer(serializers.ModelSerializer):
 
-    lessons = LessonSerializer(many=True,source='lesson', required=False)
+    # lessons = LessonSerializer(many=True,source='lesson.all', required=False)
+    lessons = serializers.SerializerMethodField()
     lessons_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -27,15 +28,13 @@ class CourseSerializer(serializers.ModelSerializer):
     """Для отображения количества уроков в курсе"""
     @staticmethod
     def get_lessons_count(instance):
-        return instance.lesson.count()
+        return instance.lessons.count()
+
+    @staticmethod
+    def get_lessons(course):
+        if not course:
+            return []
+        lessons = course.lessons.all()
+        return LessonSerializer(lessons, many=True).data
 
 
-    """Переопределяем метод create для того чтобы можно было создавать курсы без уроков"""
-    def create(self, validated_data):
-        lessons_data = validated_data.pop('lessons', [])
-        course = Course.objects.create(**validated_data)
-
-        for lessons_data in lessons_data:
-            Lesson.objects.create(course=course, **lessons_data)
-
-        return course

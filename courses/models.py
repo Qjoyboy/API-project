@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 from users.models import User
@@ -7,6 +8,7 @@ class Course(models.Model):
     title = models.CharField(max_length=100, verbose_name='Название курса')
     preview = models.ImageField(upload_to='media/preview/', null=True, blank=True)
     description = models.TextField(verbose_name='описание')
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f'{self.title}'
@@ -19,8 +21,9 @@ class Lesson(models.Model):
     title = models.CharField(max_length=100, verbose_name='Название урока')
     preview = models.ImageField(upload_to='media/preview/', null=True, blank=True)
     description = models.TextField(verbose_name='описание урока')
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lesson', null=True, blank=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons', null=True, blank=True)
     url = models.URLField(max_length=250, null=True, blank=True)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f'{self.course.title} - {self.title}'
