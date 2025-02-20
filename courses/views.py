@@ -1,9 +1,12 @@
 from django.shortcuts import render
+from rest_framework.decorators import permission_classes
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, generics
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from courses.models import Course, Lesson, Payment
+from courses.permissions import IsModerator, IsOwner
 from courses.serializers import CourseSerializer, LessonSerializer, PaymentSerializer
 
 
@@ -17,10 +20,35 @@ class PaymentListAPIView(generics.ListAPIView):
 class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        new_lesson = serializer.save()
+        new_lesson.owner = self.request.user
+        new_lesson.save()
+
+    def get_permissions(self):
+        if self.action == 'create' or self.action =='destroy':
+            return [IsAuthenticated(), IsOwner()]
+        if self.action == 'update' or self.action =='partial_update':
+            return [IsAuthenticated(), IsModerator(), IsOwner()]
+        return [IsAuthenticated()]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated and user.user_role == "moderator":
+            return Course.objects.all()
+        return Course.objects.filter(owner=user)
+
 
 class LessonCreateAPIView(generics.CreateAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
+
+    def perform_create(self, serializer):
+        item = serializer.save(owner=self.request.user)
+        item.save()
+
 
 class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonSerializer
