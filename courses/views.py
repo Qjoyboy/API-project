@@ -6,6 +6,7 @@ from rest_framework import viewsets, generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from courses.models import Course, Lesson, Payment, Subscribe
+from courses.paginators import CoursePaginator
 from courses.permissions import IsModerator, IsOwner
 from courses.serializers import CourseSerializer, LessonSerializer, PaymentSerializer, SubscribeSerializer
 
@@ -21,6 +22,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
     permission_classes = [IsAuthenticated]
+    pagination_class = CoursePaginator
 
     def perform_create(self, serializer):
         new_lesson = serializer.save()
