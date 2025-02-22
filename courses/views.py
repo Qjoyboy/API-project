@@ -1,13 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework.decorators import permission_classes
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from courses.models import Course, Lesson, Payment
+from courses.models import Course, Lesson, Payment, Subscribe
+from courses.paginators import CoursePaginator
 from courses.permissions import IsModerator, IsOwner
-from courses.serializers import CourseSerializer, LessonSerializer, PaymentSerializer
+from courses.serializers import CourseSerializer, LessonSerializer, PaymentSerializer, SubscribeSerializer
 
 
 class PaymentListAPIView(generics.ListAPIView):
@@ -21,6 +22,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
     permission_classes = [IsAuthenticated]
+    pagination_class = CoursePaginator
 
     def perform_create(self, serializer):
         new_lesson = serializer.save()
@@ -64,3 +66,21 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
 
 class LessonDestroyAPIView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
+
+class SubscribeActiveAPIView(generics.CreateAPIView):
+    serializer_class = SubscribeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        new_sub = serializer.save()
+        new_sub.user = self.request.user
+        new_sub.course = get_object_or_404(Course, id=self.kwargs["pk"])
+        new_sub.save()
+
+class SubscribeInactiveAPIView(generics.UpdateAPIView):
+    serializer_class = SubscribeSerializer
+    permission_classes = [IsAuthenticated]
+
+
+
+

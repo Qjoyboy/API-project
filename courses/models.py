@@ -42,3 +42,7 @@ class Payment(models.Model):
         ("cash", "cash"),
     ]
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD, default='card')
+
+class Subscribe(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_sub')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_sub', null=True, blank=True)
