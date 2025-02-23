@@ -1,7 +1,7 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
-
+import json
 from courses.models import Course, Lesson
 from users.models import User
 
@@ -50,7 +50,6 @@ class CoursesTestCase(APITestCase):
             description="nontest",
             url="http://youtube.com"
         )
-
 
         urlpath = reverse('courses:lesson-update', kwargs={"pk": self.lesson.pk})
         data = {
@@ -121,3 +120,31 @@ class CoursesTestCase(APITestCase):
             response.status_code,
             status.HTTP_204_NO_CONTENT
         )
+
+    def test_activate_sub(self):
+        self.course = Course.objects.create(
+            title="Title",
+            description="Description"
+        )
+
+        urlpath = reverse("courses:sub-activate", kwargs={"pk":self.course.pk})
+        data={
+            "sub":True
+        }
+        response = self.client.patch(
+            urlpath,
+            data=json.dumps(data),
+            content_type="application/json"
+        )
+        print(response.json())
+        self.assertEqual(
+            response.json(),
+            {"sub":True},
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+

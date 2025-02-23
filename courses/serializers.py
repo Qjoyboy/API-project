@@ -44,10 +44,8 @@ class CourseSerializer(serializers.ModelSerializer):
         lessons = course.lessons.all()
         return LessonSerializer(lessons, many=True).data
 
-    def get_sub(self,obj):
-        request = self.context.get("request")
-        if request.user.is_authenticated:
-            return Subscribe.objects.filter(user=request.user, course=obj).exists()
-        return False
+    def get_sub(self, obj):
+        user = self.context["request"].user
+        return Subscribe.objects.filter(course=obj, user=user).exists()
 
 

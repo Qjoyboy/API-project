@@ -4,6 +4,7 @@ from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 
 from courses.models import Course, Lesson, Payment, Subscribe
 from courses.paginators import CoursePaginator
@@ -67,19 +68,30 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
 class LessonDestroyAPIView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
 
-class SubscribeActiveAPIView(generics.CreateAPIView):
+class SubscribeActiveAPIView(generics.UpdateAPIView):
     serializer_class = SubscribeSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        new_sub = serializer.save()
-        new_sub.user = self.request.user
-        new_sub.course = get_object_or_404(Course, id=self.kwargs["pk"])
-        new_sub.save()
+    """Напишу честно, я не понял как сделать отдельный класс с валидацией проверки на булево.
+    Поэтому внедрил валидацию в саму вьюху, от чего код стал громоздким.
+    Минусы: код стал некрасивым
+    Плюсы: это вроде как работает, а значит нельзя трогать
+    1:1))))"""
 
-class SubscribeInactiveAPIView(generics.UpdateAPIView):
-    serializer_class = SubscribeSerializer
-    permission_classes = [IsAuthenticated]
+    def update(self, request, *args, **kwargs):
+        course = get_object_or_404(Course, id=kwargs["pk"])
+        user = request.user
+
+        sub_value = request.data.get("sub")
+        if not isinstance(sub_value, bool):
+            return Response({"error":f"Поле sub должно быть true или false. У вас - {sub_value}"}, status=400)
+
+        if sub_value:
+            Subscribe.objects.get_or_create(course=course, user=user)
+        else:
+            Subscribe.objects.filter(course=course, user=user).delete()
+        return Response({"sub":sub_value}, status=200)
+
 
 
 
