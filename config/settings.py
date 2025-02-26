@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework',
     'django_filters',
+    'drf_yasg',
 
     'users',
     'courses',
@@ -143,3 +144,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
+
+STRIPE_API_KEY = "sk_test_51QwUNlPGFVz1lBvMTZKgLmLZL32rBfD651kxIr5wb8FyfXia9sJ55vkkRwIG5Z2XUvX3oEQGb9J3an28znyrYo5M00IcRwT8v8"
+STRIPE_API_URL = 'https://api.stripe.com'
