@@ -40,8 +40,10 @@ INSTALLED_APPS = [
 
     'rest_framework_simplejwt',
     'rest_framework',
+    'django_celery_beat',
     'django_filters',
     'drf_yasg',
+    'celery',
 
     'users',
     'courses',
@@ -147,3 +149,17 @@ REST_FRAMEWORK = {
 
 STRIPE_API_KEY = "sk_test_51QwUNlPGFVz1lBvMTZKgLmLZL32rBfD651kxIr5wb8FyfXia9sJ55vkkRwIG5Z2XUvX3oEQGb9J3an28znyrYo5M00IcRwT8v8"
 STRIPE_API_URL = 'https://api.stripe.com'
+
+# Например, Redis, который по умолчанию работает на порту 6379
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+
+# URL-адрес брокера результатов, также Redis
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = "smtp.yandex.ru"
+EMAIL_PORT = 587
+EMAIL_USE_SSL = True
+
+EMAIL_HOST_USER = 'joyboy.7@yandex.ru'
+EMAIL_HOST_PASSWORD = 'vkdfyfamkbelzjuh'

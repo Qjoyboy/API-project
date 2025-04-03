@@ -12,6 +12,7 @@ from courses.paginators import CoursePaginator
 from courses.permissions import IsModerator, IsOwner
 from courses.serializers import CourseSerializer, LessonSerializer, PaymentSerializer, SubscribeSerializer
 from courses.services import create_payment, retrieve_payment
+from courses.tasks import send_email_of_update
 from users.models import User
 
 
@@ -86,6 +87,13 @@ class CourseViewSet(viewsets.ModelViewSet):
             return Course.objects.all()
         return Course.objects.filter(owner=user)
 
+    # def perform_update(self, serializer):
+    #     user = self.request.user
+    #     course = get_object_or_404(Course, id=self.kwargs["pk"])
+    #     instance = Subscribe.objects.filter(course=course, user=user)
+    #     if instance:
+    #         send_email_of_update.delay(id=self.kwargs["pk"])
+
 
 class LessonCreateAPIView(generics.CreateAPIView):
     serializer_class = LessonSerializer
@@ -93,6 +101,7 @@ class LessonCreateAPIView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         item = serializer.save(owner=self.request.user)
+        send_email_of_update.delay()
         item.save()
 
 
