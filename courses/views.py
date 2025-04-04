@@ -87,12 +87,6 @@ class CourseViewSet(viewsets.ModelViewSet):
             return Course.objects.all()
         return Course.objects.filter(owner=user)
 
-    # def perform_update(self, serializer):
-    #     user = self.request.user
-    #     course = get_object_or_404(Course, id=self.kwargs["pk"])
-    #     instance = Subscribe.objects.filter(course=course, user=user)
-    #     if instance:
-    #         send_email_of_update.delay(id=self.kwargs["pk"])
 
 
 class LessonCreateAPIView(generics.CreateAPIView):

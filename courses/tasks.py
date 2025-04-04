@@ -18,6 +18,7 @@ def send_email_of_update():
         fail_silently=False
     )
 
+@shared_task
 def users_active_check(pk):
     user = User.objects.get(pk=pk)
     now = datetime.now()
