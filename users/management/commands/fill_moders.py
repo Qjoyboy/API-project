@@ -6,9 +6,9 @@ from users.models import User
 class Command(BaseCommand):
     def handle(self, *args, **options):
         mods_list = [
-            {'email': 'mod1@email.com', 'is_staff': True, 'city': 'Moscow', 'phone': '8777-7777777',
+            {'email': 'mod1@email.com', 'password':'123','is_staff': True, 'city': 'Moscow', 'phone': '8777-7777777',
              'avatar': None},
-            {'email': 'mod2@email.com', 'is_staff': True, 'city': 'Los-Angeles', 'phone': '8-111-111-11-11',
+            {'email': 'mod2@email.com','password':'123', 'is_staff': True, 'city': 'Los-Angeles', 'phone': '8-111-111-11-11',
              'avatar': None}
         ]
 

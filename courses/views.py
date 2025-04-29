@@ -12,6 +12,7 @@ from courses.paginators import CoursePaginator
 from courses.permissions import IsModerator, IsOwner
 from courses.serializers import CourseSerializer, LessonSerializer, PaymentSerializer, SubscribeSerializer
 from courses.services import create_payment, retrieve_payment
+from courses.tasks import send_email_of_update
 from users.models import User
 
 
@@ -87,12 +88,14 @@ class CourseViewSet(viewsets.ModelViewSet):
         return Course.objects.filter(owner=user)
 
 
+
 class LessonCreateAPIView(generics.CreateAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
 
     def perform_create(self, serializer):
         item = serializer.save(owner=self.request.user)
+        send_email_of_update.delay()
         item.save()
 
 
